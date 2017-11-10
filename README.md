@@ -24,4 +24,4 @@ Folgendes muss installiert sein!
 ## Kopilieren
 Anschließend kann webserver.ino aus diesem Repository laden und *username* und *password* anpassen  kompilieren und auf den ESP8266 geladen werden!
 ## Verkabelung
-![Wireing](doc/sketch_Steckplatine.PNG)
+![Wireing](doc/steckplatine.png)
