@@ -18,7 +18,6 @@ Folgendes muss installiert sein!
 - "git checkout update_sdk_2.0.0"
 - "cd tools"
 - "python get.py"
-- Anschließend diese Repository auschecken oder Download auswählen
 - die Datei wpa2_enterprise.h (https://raw.githubusercontent.com/jtuttas/ESP8266-WPA2-Enterprise/master/res/wpa2_enterprise.h) aus dem Ordner "res" kopieren nach "c:\Users\{UserName}\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\tools\sdk\include\"
 - die Datei libwpa2.a (https://github.com/jtuttas/ESP8266-WPA2-Enterprise/raw/master/res/libwpa2.a) aus dem Ordner "res" kopieren nach "c:\Users\{UserName}\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\tools\sdk\lib\"
 ## Kompilieren
