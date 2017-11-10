@@ -12,7 +12,7 @@ Folgendes muss installiert sein!
 - Libary f. DS18B20 installieren, dazu ZIP hier laden (https://github.com/milesburton/Arduino-Temperature-Control-Library/archive/master.zip) entpacken und Umbenennen in DallasTemperature. Anschließend die Files kopieren in Arduino/libaries
 - WebSocketsServer Libary herunter laden unter (https://github.com/Links2004/arduinoWebSockets/tree/master/src) und unter libaries einen Ordner erzeugen "Websockets" dort die heruntergeladenen Dateien hin kopieren.
 ## SDK2.0 f. WPA2 Enterprise installieren
-- unter "c:\Users\{UserName}\AppData\Local\Arduino15\packages\esp8266\hardware" den Ordner wsp8266 löschen
+- unter "c:\Users\{UserName}\AppData\Local\Arduino15\packages\esp8266\hardware" den Ordner esp8266 löschen
 - in das Verzeichnis "c:\Users\{UserName}\AppData\Local\Arduino15\packages\esp8266\hardware" wechseln und "git clone https://github.com/esp8266/Arduino.git esp8266" aufrufen.
 - "cd esp8266"
 - "git checkout update_sdk_2.0.0"
