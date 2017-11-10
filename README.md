@@ -21,7 +21,7 @@ Folgendes muss installiert sein!
 - Anschließend diese Repository auschecken oder Download auswählen
 - die Datei wpa2_enterprise.h aus dem Ordner "res" kopieren nach "c:\Users\{UserName}\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\tools\sdk\include\"
 - die Datei libwpa2.a aus dem Ordner "res" kopieren nach "c:\Users\{UserName}\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\tools\sdk\lib\"
-## Kopilieren
+## Kompilieren
 Anschließend kann webserver.ino aus diesem Repository laden und *username* und *password* anpassen  kompilieren und auf den ESP8266 geladen werden!
 ## Verkabelung
 ![Wireing](doc/steckplatine.png)
