@@ -1,20 +1,18 @@
-#include <ESP8266WiFi.h>
+#include "esp_wpa2.h"
+#include <WiFi.h>
 #include <WebSocketsServer.h>
 #include <DallasTemperature.h>
 
-
-extern "C" {
-#include "user_interface.h"
-#include "wpa2_enterprise.h"
-}
-
-
 // SSID to connect to
 static const char* ssid = "MMBBS-Intern";
+//static const char* ssid = "FRITZ!Box Fon WLAN 7390";
 // Username for authentification
 static const char* username = "tuttas";
 // Password for authentication
 static const char* password = "geheim!";
+#define EAP_ID "tuttas"
+#define EAP_USERNAME "tuttas"
+#define EAP_PASSWORD "geheim!!"
 
 // Data wire is plugged into pin D1 on the ESP8266 12-E - GPIO 5
 #define ONE_WIRE_BUS 5
@@ -31,7 +29,7 @@ unsigned long timer = 0;
 WiFiServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(8080);
 const String header_ok = "HTTP/1.1 200 OK\r\n";
-const String htmlhead = "\r\n<!DOCTYPE HTML>\r\n<html><head><title>ESP8266</title> <meta charset=\"UTF-8\"> <link rel=\"stylesheet\" href=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\"> <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script></head><body>";
+const String htmlhead = "\r\n<!DOCTYPE HTML>\r\n<html><head><title>ESP32</title> <meta charset=\"UTF-8\"> <link rel=\"stylesheet\" href=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\"> <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script></head><body>";
 const String htmltail = "\r\n</body></html>\r\n";
 const String contentTypeText = "Content-Type: text/html\r\n";
 bool flasher = false;
@@ -52,8 +50,8 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
       break;
     case WStype_CONNECTED:
       {
-        IPAddress ip = webSocket.remoteIP(num);
-        Serial.printf("[%u] WS Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
+        //IPAddress ip = webSocket.remoteIP(num);
+        //Serial.printf("[%u] WS Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
         // send message to client
         String s = getJson();
         webSocket.sendTXT(num, s);
@@ -70,7 +68,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
       break;
     case WStype_BIN:
       Serial.printf("[%u] WS get binary lenght: %u\n", num, lenght);
-      hexdump(payload, lenght);
+      //hexdump(payload, lenght);
 
       // send message to client
       // webSocket.sendBIN(num, payload, lenght);
@@ -91,29 +89,27 @@ void setup() {
   pinMode(4, OUTPUT);
 
 
-  // WPA2 Connection starts here
-  // Setting ESP into STATION mode only (no AP mode or dual mode)
-    wifi_set_opmode(STATION_MODE);
-    struct station_config wifi_config;
-    memset(&wifi_config, 0, sizeof(wifi_config));
-    strcpy((char*)wifi_config.ssid, ssid);
-    wifi_station_set_config(&wifi_config);
-    wifi_station_clear_cert_key();
-    wifi_station_clear_enterprise_ca_cert();
-    wifi_station_set_wpa2_enterprise_auth(1);
-    wifi_station_set_enterprise_identity((uint8*)username, strlen(username));
-    wifi_station_set_enterprise_username((uint8*)username, strlen(username));
-    wifi_station_set_enterprise_password((uint8*)password, strlen(password));
-    wifi_station_connect();
-  // WPA2 Connection ends here
+ 
+   // WPA2 enterprise magic starts here
+   
+    WiFi.disconnect(true);      
+    esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)EAP_ID, strlen(EAP_ID));
+    esp_wifi_sta_wpa2_ent_set_username((uint8_t *)EAP_USERNAME, strlen(EAP_USERNAME));
+    esp_wifi_sta_wpa2_ent_set_password((uint8_t *)EAP_PASSWORD, strlen(EAP_PASSWORD));
+    esp_wpa2_config_t config = WPA2_CONFIG_INIT_DEFAULT(); 
+    esp_wifi_sta_wpa2_ent_enable(&config);
+    WiFi.begin(ssid);
+    // WPA2 enterprise magic ends here
+ 
 
   // Normal Connection starts here
   /*
   WiFi.mode(WIFI_STA);
   Serial.write("\r\nConnect to WLAN");
   WiFi.begin(ssid, password);
-  // Normal Connection ends here
   */
+  // Normal Connection ends here
+  
 
   // Wait for connection AND IP address from DHCP
   Serial.println();
@@ -163,7 +159,7 @@ void loop() {
       tempC = DS18B20.getTempCByIndex(0);
       Serial.println("Temperature is " + String(tempC));
       if (tempC!=-127) {
-        timer = millis() + 15000;
+         timer = millis() + 15000;
         if (tempC != oldTempC) {
           oldTempC = tempC;
           dtostrf(tempC, 2, 2, temperatureCString);
@@ -216,7 +212,7 @@ void loop() {
     s = header_ok;
     s += contentTypeText;
     s += htmlhead;
-    s += "<div class=\"container\" style=\"text-align: center;\"><div class=\"jumbotron\"><h1>ESP8266</h1>";
+    s += "<div class=\"container\" style=\"text-align: center;\"><div class=\"jumbotron\"><h1>ESP32</h1>";
 
     s += "<h3 id=\"idTemp\">Temperatur: " + String(temperatureCString) + " °C</h3></div></div><hr/>";
     s += "<div class=\"row\"><div class=\"col-md-6 col-md-offset-3\">";
