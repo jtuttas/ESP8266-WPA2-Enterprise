@@ -12,7 +12,7 @@ static const char* username = "tuttas";
 static const char* password = "geheim!";
 #define EAP_ID "tuttas"
 #define EAP_USERNAME "tuttas"
-#define EAP_PASSWORD "geheim!!"
+#define EAP_PASSWORD "geheim"
 
 // Data wire is plugged into pin D1 on the ESP8266 12-E - GPIO 5
 #define ONE_WIRE_BUS 5
@@ -168,6 +168,9 @@ void loop() {
           webSocket.broadcastTXT(s);
         }
       }
+      else {
+        delay(500);
+      }
     }
 
   }
@@ -192,8 +195,8 @@ void loop() {
         String s = getJson();
         webSocket.broadcastTXT(s);
         clientS.print(s);
+        clientS.flush();
         clientS.stop();
-        return;
       }
       if (param.indexOf("state=false") != -1) {
         digitalWrite(4, LOW);
@@ -201,51 +204,53 @@ void loop() {
         String s = getJson();
         webSocket.broadcastTXT(s);
         clientS.print(s);
+        clientS.flush();
         clientS.stop();
-        return;
       }
     }
-    Serial.println("\r\nparam >" + param + "<");
-
-    clientS.flush();
-    String s;
-    s = header_ok;
-    s += contentTypeText;
-    s += htmlhead;
-    s += "<div class=\"container\" style=\"text-align: center;\"><div class=\"jumbotron\"><h1>ESP32</h1>";
-
-    s += "<h3 id=\"idTemp\">Temperatur: " + String(temperatureCString) + " °C</h3></div></div><hr/>";
-    s += "<div class=\"row\"><div class=\"col-md-6 col-md-offset-3\">";
-    if (state) {
-      s += "<button  id=\"on\" type=\"button\" class=\"btn btn-warning btn-lg btn-block\">OFF</button>";
-    }
     else {
-      s += "<button  id=\"on\" type=\"button\" class=\"btn btn-success btn-lg btn-block\">ON</button>";
+      Serial.println("\r\nparam >" + param + "<");
+  
+      String s;
+      s = header_ok;
+      s += contentTypeText;
+      s += htmlhead;
+      s += "<div class=\"container\" style=\"text-align: center;\"><div class=\"jumbotron\"><h1>ESP32</h1>";
+  
+      s += "<h3 id=\"idTemp\">Temperatur: " + String(temperatureCString) + " °C</h3></div></div><hr/>";
+      s += "<div class=\"row\"><div class=\"col-md-6 col-md-offset-3\">";
+      if (state) {
+        s += "<button  id=\"on\" type=\"button\" class=\"btn btn-warning btn-lg btn-block\">OFF</button>";
+      }
+      else {
+        s += "<button  id=\"on\" type=\"button\" class=\"btn btn-success btn-lg btn-block\">ON</button>";
+      }
+      s += "</div></div>";
+      s += "<script>\r\n";
+      s += "var state=" + String(state) + "\r\n";
+      s += "console.log(\"state=\"+state);";
+      s += " webSocket = new WebSocket(\"ws://" + ip + ":8080\");\r\n";
+      s += " webSocket.onerror = function (event) {\r\n";
+      s += "   console.log(\"Error, failed to Connect to Websocket\");\r\n";
+      s += " }\r\n";
+      s += " webSocket.onmessage = function (event) {\r\n";
+      s += "    var obj = JSON.parse(event.data);";
+      s += "    console.log(\"Websocket receive data:\" + JSON.stringify(obj));\r\n";
+      s += "    $(\"#idTemp\").text(\"Temperature: \"+obj.temperature+\" °C\");\r\n";
+      s += " state=obj.state;\r\n";
+      s += " if (obj.state==1) {$(\"#on\").text(\"Off\");$(\"#on\").removeClass(\"btn-success\");$(\"#on\").addClass(\"btn-warning\");}\r\n";
+      s += " else {$(\"#on\").text(\"On\");$(\"#on\").removeClass(\"btn-warning\");$(\"#on\").addClass(\"btn-success\");}\r\n";
+      s += " };\r\n";
+      s += " $(\"#on\").click(function () {\r\n";
+      s += "   $.get(\"?state=\"+!state, function(data, status){\r\n";
+      s += "     console.log(\"Data: \" + data + \"Status: \" + status);\r\n";
+      s += "   });\r\n";
+      s += " });\r\n";
+      s += "</script>\r\n";
+      s += htmltail;
+      clientS.print(s);
+      clientS.flush();
+      clientS.stop();
     }
-    s += "</div></div>";
-    s += "<script>\r\n";
-    s += "var state=" + String(state) + "\r\n";
-    s += "console.log(\"state=\"+state);";
-    s += " webSocket = new WebSocket(\"ws://" + ip + ":8080\");\r\n";
-    s += " webSocket.onerror = function (event) {\r\n";
-    s += "   console.log(\"Error, failed to Connect to Websocket\");\r\n";
-    s += " }\r\n";
-    s += " webSocket.onmessage = function (event) {\r\n";
-    s += "    var obj = JSON.parse(event.data);";
-    s += "    console.log(\"Websocket receive data:\" + JSON.stringify(obj));\r\n";
-    s += "    $(\"#idTemp\").text(\"Temperature: \"+obj.temperature+\" °C\");\r\n";
-    s += " state=obj.state;\r\n";
-    s += " if (obj.state==1) {$(\"#on\").text(\"Off\");$(\"#on\").removeClass(\"btn-success\");$(\"#on\").addClass(\"btn-warning\");}\r\n";
-    s += " else {$(\"#on\").text(\"On\");$(\"#on\").removeClass(\"btn-warning\");$(\"#on\").addClass(\"btn-success\");}\r\n";
-    s += " };\r\n";
-    s += " $(\"#on\").click(function () {\r\n";
-    s += "   $.get(\"?state=\"+!state, function(data, status){\r\n";
-    s += "     console.log(\"Data: \" + data + \"Status: \" + status);\r\n";
-    s += "   });\r\n";
-    s += " });\r\n";
-    s += "</script>\r\n";
-    s += htmltail;
-    clientS.print(s);
-    clientS.stop();
   }
 }

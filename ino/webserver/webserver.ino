@@ -196,6 +196,7 @@ void loop() {
         String s = getJson();
         webSocket.broadcastTXT(s);
         clientS.print(s);
+        clientS.flush();
         clientS.stop();
         return;
       }
@@ -205,13 +206,13 @@ void loop() {
         String s = getJson();
         webSocket.broadcastTXT(s);
         clientS.print(s);
+        clientS.flush();
         clientS.stop();
         return;
       }
     }
     Serial.println("\r\nparam >" + param + "<");
 
-    clientS.flush();
     String s;
     s = header_ok;
     s += contentTypeText;
@@ -250,6 +251,7 @@ void loop() {
     s += "</script>\r\n";
     s += htmltail;
     clientS.print(s);
+    clientS.flush();
     clientS.stop();
   }
 }
