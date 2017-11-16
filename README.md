@@ -49,5 +49,6 @@ static const char* ssid = "MMBBS-Intern";
 // Username for authentification
 #define EAP_USERNAME "tuttas"
 #define EAP_PASSWORD "geheim!"
-
 ```
+## Verkabelung
+![Wireing](doc/sketch32_Steckplatine.png)
